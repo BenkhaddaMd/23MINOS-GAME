@@ -5,6 +5,7 @@
         "structure.h": "c",
         "vue.h": "c",
         "modele.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "stdio.h": "c"
     }
 }

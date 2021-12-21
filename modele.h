@@ -1,5 +1,4 @@
-
-// MODELE
+///////// MODELE /////////
 
 int alea_int(int N) 
 { 
@@ -23,7 +22,7 @@ void init_dominos(Domino *dominos)
     }
 }
 
-Domino* melange_dominos(Domino *dominos)
+void melange_dominos(Domino *dominos, Domino **pioche)
 {
     int i, r, pris[28];
     Domino *melangeDominos = NULL, *pointeurPosition;
@@ -55,5 +54,34 @@ Domino* melange_dominos(Domino *dominos)
             i++;      
         }
     }
-    return melangeDominos;
+    *pioche = melangeDominos;
+}
+
+Domino* piocher(Domino **dominos)
+{
+    Domino *noeud = *dominos;
+    *dominos = (*dominos)->suivant;
+    noeud->suivant = NULL;
+    return noeud;
+}
+
+void distribuer_dominos(JoueurPlateau *joueur, int nb, Domino **pioche)
+{
+    for(int i = 0; i < nb; i++)
+    {
+        Domino *listePosition = NULL;
+        for(int j = 0; j < 7; j++)
+        {
+            if(listePosition == NULL)
+            {
+                joueur[i].liste = piocher(pioche);
+                listePosition = joueur[i].liste;
+            }
+            else
+            {
+                listePosition->suivant = piocher(pioche);
+                listePosition = listePosition->suivant;
+            }
+        }
+    }
 }

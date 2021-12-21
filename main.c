@@ -11,9 +11,15 @@ int main(int argc, char **argv)
 {
     Domino dominos[28];
     Domino *pioche;
+    JoueurPlateau joueur[3];
+
     init_dominos(dominos);
-    pioche = melange_dominos(dominos);
+    melange_dominos(dominos, &pioche);
     affiche_dominos_melange(pioche);
-    getchar();
+
+    distribuer_dominos(joueur, 3, &pioche);
+    affiche_joueur(joueur);
+    affiche_dominos_melange(pioche);
+
     return 0;
 }
