@@ -19,7 +19,9 @@ int main(int argc, char **argv)
 
     distribuer_dominos(joueur, 3, &pioche);
     affiche_joueur(joueur);
-    affiche_dominos_melange(pioche);
+    qui_commence(joueur, 3);
+    printf("les dominos de jeu \n");
+    affiche_joueur(joueur);
 
     return 0;
 }

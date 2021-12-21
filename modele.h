@@ -68,20 +68,86 @@ Domino* piocher(Domino **dominos)
 void distribuer_dominos(JoueurPlateau *joueur, int nb, Domino **pioche)
 {
     for(int i = 0; i < nb; i++)
-    {
+    { 
         Domino *listePosition = NULL;
-        for(int j = 0; j < 7; j++)
-        {
-            if(listePosition == NULL)
+        if (nb <= 2 ){
+       
+            for(int j = 0; j < 7; j++)
             {
-                joueur[i].liste = piocher(pioche);
-                listePosition = joueur[i].liste;
+                if(listePosition == NULL)
+                {
+                    joueur[i].liste = piocher(pioche);
+                    listePosition = joueur[i].liste;
+                }
+                else
+                {
+                    listePosition->suivant = piocher(pioche);
+                    listePosition = listePosition->suivant;
+                }
             }
-            else
+        }else
+        {
+                for(int j = 0; j < 5; j++)
             {
-                listePosition->suivant = piocher(pioche);
-                listePosition = listePosition->suivant;
+                if(listePosition == NULL)
+                {
+                    joueur[i].liste = piocher(pioche);
+                    listePosition = joueur[i].liste;
+                }
+                else
+                {
+                    listePosition->suivant = piocher(pioche);
+                    listePosition = listePosition->suivant;
+                }
             }
         }
+        
     }
 }
+
+
+void deleteNode(Domino* list, Domino *to_delete)
+{
+    Domino *temp = list, *prev;
+    if ((temp->valeurDroite == to_delete->valeurDroite) && (temp->valeurGauche == to_delete->valeurGauche)) {
+            list = temp->suivant; 
+            free(temp); 
+            return;
+    }
+    while (temp != NULL) {
+            prev = temp;
+            temp = temp->suivant;
+    }
+    if (temp == NULL)
+        return;
+    prev->suivant = temp->suivant;
+    free(temp); 
+}
+
+void qui_commence(JoueurPlateau *joueur,int nb){
+      Domino *list;
+      Domino *max;
+      max->valeurDroite=0;
+      max->valeurGauche=0;
+    JoueurPlateau *joueur_1;
+     for(int k=0; k<nb; k++)
+    {
+        Domino *position = joueur[k].liste;
+        
+        while (position != NULL)
+        {
+            if ((position->valeurDroite) == (position->valeurGauche) && (max->valeurDroite) <= (position->valeurDroite))
+            {
+                    max->valeurDroite = position->valeurDroite;
+                    max->valeurGauche = position->valeurDroite;
+                    list = position;
+                    position = position->suivant;
+            }else  position = position->suivant;
+        }
+    }
+
+     printf(" le domaino a commence [ %d | %d ]\n", max->valeurDroite,max->valeurGauche);
+     deleteNode(list,max);
+}
+
+

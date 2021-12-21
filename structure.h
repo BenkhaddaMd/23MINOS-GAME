@@ -4,7 +4,10 @@ typedef struct domino{
     int valeurGauche;
     int valeurDroite;
     struct domino* suivant;
+
 }Domino;
+
+
 
 typedef struct joueur{
     char nom[25];
