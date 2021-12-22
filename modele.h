@@ -65,23 +65,76 @@ Domino* piocher(Domino **dominos)
     return noeud;
 }
 
-void distribuer_dominos(JoueurPlateau *joueur, int nb, Domino **pioche)
+void distribuer_dominos(JoueurPlateau *joueur, int nbJoueurs, Domino **pioche, int nbDist)
 {
-    for(int i = 0; i < nb; i++)
+    for(int i = 0; i < nbJoueurs; i++)
     {
         Domino *listePosition = NULL;
-        for(int j = 0; j < 7; j++)
+        for(int j = 0; j < nbDist; j++)
         {
             if(listePosition == NULL)
             {
                 joueur[i].liste = piocher(pioche);
                 listePosition = joueur[i].liste;
+                listePosition->precedent = NULL;
             }
             else
             {
                 listePosition->suivant = piocher(pioche);
+                listePosition->suivant->precedent = listePosition;
                 listePosition = listePosition->suivant;
             }
         }
     }
+}
+
+Domino* supprime_noeud(Domino **liste, int indice)
+{
+    Domino *aRetourne;
+    while (indice > 0)
+    {
+        liste = &(*liste)->suivant;
+        indice--;
+    }
+    aRetourne = *liste;
+    if((*liste)->precedent == NULL)
+    {
+        *liste = (*liste)->suivant;
+        (*liste)->precedent = NULL;
+    }
+    else if((*liste)->suivant == NULL)
+    {
+        (*liste)->precedent->suivant = NULL;
+    }
+    else
+    {
+        (*liste)->precedent->suivant = aRetourne->suivant;
+        (*liste)->precedent = aRetourne->precedent;
+    } 
+    aRetourne->precedent = NULL;
+    aRetourne->suivant = NULL;
+    return aRetourne; 
+}
+
+void qui_commence(JoueurPlateau *joueur,int nb, int nbDist)
+{
+    Domino *position;
+    int max=0,  positionPar = 0, positionMax;
+    for( int k=0; k<nb; k++)
+    {
+        position = joueur[k].liste;
+        while(position != NULL)
+        {
+            if((position->valeurDroite) == (position->valeurGauche) && max <= (position->valeurDroite))
+            {
+                max = position->valeurDroite;
+                positionMax = positionPar;
+            }
+            position = position->suivant;
+            positionPar = positionPar+1;
+        }
+    }
+     printf(" le domaino a commence [ %d | %d ]\n", max,max);
+     printf(" joueur %d indice %d \n", positionMax/nbDist, positionMax%nbDist);
+     position = supprime_noeud(&joueur[positionMax/nbDist].liste,positionMax%nbDist);
 }
