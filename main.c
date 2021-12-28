@@ -2,69 +2,79 @@
 #include <stdlib.h>
 #include <time.h>
 #include <SDL.h>
+#include <SDL_image.h>
 #include "structure.h"
 #include "modele.h"
 #include "vue.h"
 
 int main(int argc, char **argv)
 {
-    Domino dominos[28];
+    int termine = 0, tour;
+    int choixDomino, choixEmplacement;
     Domino *pioche;
-    JoueurPlateau joueur[3];
+    JoueurPlateau joueur[2];
+    Domino *plateau;
     
-    init_dominos(dominos);
-    melange_dominos(dominos, &pioche);
+    melange_dominos(&pioche);
     affiche_dominos_melange(pioche);
-    distribuer_dominos(joueur, 3, &pioche, 5);
-    affiche_joueur(joueur);
-    qui_commence(joueur, 3, 5);
-    affiche_joueur(joueur);
+    distribuer_dominos(joueur, 2, &pioche);
+    affiche_joueur(joueur, 2);
+    plateau = qui_commence(joueur, 2, &tour);
+    affiche_joueur(joueur, 2);
     affiche_dominos_melange(pioche);
-  
-/*
-    SDL_Surface *ecran = NULL;
-    SDL_Surface *menu = NULL;
-    int continuer = 3;
-    SDL_Rect positionMenu;
-    SDL_Event event;
-    SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_WM_SetIcon(IMG_Load("link.bmp"), NULL);
-    ecran = SDL_SetVideoMode(952, 442, 32, SDL_HWSURFACE | SDL_DOUBLEBUF);
-    SDL_WM_SetCaption("23MINOS", NULL);
-
-    menu = IMG_Load("menu_png");
-    positionMenu.x = 0;
-    positionMenu.y = 0;
-
-    while(continuer)
+    while(!termine)
     {
-        SDL_WaitEvent(&event);
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            continuer = 0;
-            break;
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_ESCAPE:
-                continuer = 0;
-                break;
-            
-            default:
-                break;
-            }
-            break;
+        printf("######## | Jouer | ########\n");
+        printf("#%d Jouer \n", tour);
+        affiche_dominos_melange(plateau);
+
+        printf(" - les choix : ");
+        scanf("%d%d", &choixDomino, &choixEmplacement);
         
-        default:
-            break;
-        }
-        SDL_BlitSurface(menu, NULL, ecran, &positionMenu);
-        SDL_flip(ecran);
+        ajout_plateau(&plateau, supprime_noeud(&joueur[tour].liste, choixDomino), choixEmplacement);
+        affiche_joueur(joueur, 2);
+
+        tour = (tour+1) % 2;
     }
-    SDL_FreeSurface(menu);
+  
+    
+   /*
+    int quit = 0;
+    SDL_Event event;
+ 
+    SDL_Init(SDL_INIT_VIDEO);
+    IMG_Init(IMG_INIT_JPG);
+    SDL_Window * window = SDL_CreateWindow("SDL2 Displaying Image",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 940, 580, 0);
+    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
+    SDL_Surface * image = IMG_Load("image.bmp");
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
+    SDL_Rect position;
+    position.x = 80;
+    position.y = 0;
+    position.w = 569;
+    position.h = 512;
+
+    while (!quit)
+    {
+       SDL_WaitEvent(&event);
+
+       switch(event.type)
+       {
+       case SDL_QUIT:
+           quit = 1;
+           break;
+       }
+       SDL_RenderCopy(renderer, texture, NULL, &position);
+       SDL_RenderPresent(renderer);
+    }
+
+    SDL_DestroyTexture(texture);
+    SDL_FreeSurface(image);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
     SDL_Quit();
-      */
+
+    */
     return 0;
 }

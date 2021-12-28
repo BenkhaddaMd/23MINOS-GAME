@@ -19,9 +19,9 @@ void affiche_dominos_melange(Domino *dominos)
     printf("X");
 }
 
-void affiche_joueur(JoueurPlateau *joueur)
+void affiche_joueur(JoueurPlateau *joueur, int nbJoueurs)
 {
-    for(int k=0; k<3; k++)
+    for(int k=0; k<nbJoueurs; k++)
     {
         printf("\n Joueur %d : ",k);
         Domino *position = joueur[k].liste;
