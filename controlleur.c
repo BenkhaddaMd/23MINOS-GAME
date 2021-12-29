@@ -3,9 +3,9 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include "structure.h"
-#include "modele.h"
-#include "vue.h"
+#include "modele/structure.h"
+#include "modele/modele.h"
+#include "vue/vue.h"
 
 int main(int argc, char **argv)
 {
