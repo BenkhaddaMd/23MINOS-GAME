@@ -10,6 +10,12 @@
         "sdl_image.h": "c",
         "sdl_version.h": "c",
         "begin_code.h": "c",
-        "sdl_video.h": "c"
+        "sdl_video.h": "c",
+        "sdl_ttf.h": "c",
+        "cmath": "cpp",
+        "exception": "cpp",
+        "type_traits": "cpp",
+        "limits": "cpp",
+        "typeinfo": "cpp"
     }
 }

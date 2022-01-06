@@ -3,12 +3,15 @@
 #include <time.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "modele/structure.h"
 #include "modele/modele.h"
 #include "vue/vue.h"
 
 int main(int argc, char **argv)
 {
+    /*
+
     int termine = 0, tour;
     int choixDomino, choixEmplacement;
     Domino *pioche;
@@ -39,42 +42,32 @@ int main(int argc, char **argv)
     }
   
     
-   /*
+   */
+    
     int quit = 0;
+    ParametresJeu param;
     SDL_Event event;
- 
-    SDL_Init(SDL_INIT_VIDEO);
-    IMG_Init(IMG_INIT_JPG);
-    SDL_Window * window = SDL_CreateWindow("SDL2 Displaying Image",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 940, 580, 0);
-    SDL_Renderer * renderer = SDL_CreateRenderer(window, -1, 0);
-    SDL_Surface * image = IMG_Load("image.bmp");
-    SDL_Texture * texture = SDL_CreateTextureFromSurface(renderer, image);
+    SDL_bool passeInterface_2;
+    SDL_Window * window;
+    SDL_Renderer * renderer;
+    SDL_Surface * image = IMG_Load("dominos.gif");
+    SDL_Texture * texture;
     SDL_Rect position;
-    position.x = 80;
-    position.y = 0;
-    position.w = 569;
-    position.h = 512;
 
-    while (!quit)
-    {
-       SDL_WaitEvent(&event);
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    init_fenetre(&window, &renderer, &texture);
 
-       switch(event.type)
-       {
-       case SDL_QUIT:
-           quit = 1;
-           break;
-       }
-       SDL_RenderCopy(renderer, texture, NULL, &position);
-       SDL_RenderPresent(renderer);
-    }
+    interface_1(&window, &renderer, &texture);
+    event_interface_1(&window, &renderer, &texture, &param);
 
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(image);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    interface_2(&window, &renderer, &texture);
+    event_interface_2(&window, &renderer, &texture, &param);
+    
+    interface_3(&window, &renderer, &texture, &param);
+    event_interface_3(&window, &renderer, &texture, &param);
 
-    */
+    
+
+    detruie(&window, &renderer, &texture);
     return 0;
 }

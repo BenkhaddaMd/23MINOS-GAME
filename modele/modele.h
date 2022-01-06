@@ -179,4 +179,3 @@ void ajout_plateau(Domino **plateau, Domino *domino_a_jouer, int emplacement)
     }
     
 }
-

@@ -9,8 +9,7 @@ typedef struct domino{
 
 typedef struct joueur{
     char nom[25];
-    int scoreDominos;
-    int scoreTriominos; // score wsaf hhhh
+    int score;
 }Joueur;
 
 struct triomino{
@@ -26,3 +25,10 @@ typedef struct joueurPlateau{
     Joueur infos;
     Domino* liste;
 }JoueurPlateau;
+
+typedef struct parametresJeu{
+    int estDomino;
+    int estTriomino;
+    int nbJoueurs;
+
+}ParametresJeu;
