@@ -171,12 +171,6 @@ int estSuivant_1(SDL_Point clic)
         return 0;
 }
 
-void quite_event(SDL_Event event, int *quit)
-{
-    
-        
-}
-
 void event_interface_1(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture,ParametresJeu *param)
 {
     SDL_Point p;
@@ -295,7 +289,8 @@ void event_interface_2(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture
     }
 }
 
-void get_text_and_rect(SDL_Renderer **renderer, int x, int y, char *text, TTF_Font *font, SDL_Texture **texture) {
+void get_text_and_rect(SDL_Renderer **renderer, int x, int y, char *text, TTF_Font *font, SDL_Texture **texture) 
+{
     int text_width;
     int text_height;
     SDL_Surface *surface;
@@ -309,9 +304,10 @@ void get_text_and_rect(SDL_Renderer **renderer, int x, int y, char *text, TTF_Fo
 }
 
 void affiche_text(SDL_Renderer **renderer, SDL_Window **window, SDL_Texture **texture, char *text, SDL_Rect rect)
-{    
-    rect.x += 50;   rect.y += 20;   rect.w -= 150;   rect.h -= 50;
-    TTF_Font *font = TTF_OpenFont("Sans.ttf", 200);
+{
+    rect.x += 20;   rect.y += 20;   
+    rect.w = 20*strlen(text);  rect.h -= 50;
+    TTF_Font *font = TTF_OpenFont("Sans.ttf", 400);
     get_text_and_rect(renderer, 0, 0, text, font, texture);
     SDL_RenderCopy(*renderer, *texture, NULL, &rect);
     SDL_RenderPresent(*renderer);
@@ -352,28 +348,30 @@ void interface_3(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **tex
     SDL_RenderPresent(*renderer);
 }
 
-void efface_nom_par_defaut(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture ,int indiceJ)
+void efface_nom_par_defaut(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture ,int indiceJ, int background)
 {
     SDL_Rect rectTexte;
     SDL_Surface *input;
     rectTexte.w = 323;   rectTexte.h = 85;
     rectTexte.x = 230 + 436*(indiceJ %2); rectTexte.y = 217 + 183*(indiceJ/2);
-    input = IMG_Load("input.gif");
+    if(background)
+        input = IMG_Load("input.gif");
+    else
+        input = IMG_Load("input_insert.gif");
     *texture = SDL_CreateTextureFromSurface(*renderer, input);
     SDL_RenderCopy(*renderer, *texture, NULL, &rectTexte);
     SDL_RenderPresent(*renderer);    
 }
 
-void event_texte(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture ,int indiceJ)
+void event_texte(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture , int indiceJ, char *texte)
 {
     int quit = 0;
     SDL_Event eventK;
-    char texte[15];
     int i=0;
     char input;
     SDL_Rect rectTexte;
-    rectTexte.x = 230 + 436*(indiceJ %2); rectTexte.y = 217 + 183*(indiceJ/2);
-    affiche_text(renderer, window, texture, texte, rectTexte);
+    rectTexte.w = 323;                      rectTexte.h = 85;
+    rectTexte.x = 230 + 436*(indiceJ %2);   rectTexte.y = 217 + 183*(indiceJ/2);
     
     while (!quit)
     {
@@ -381,19 +379,24 @@ void event_texte(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **tex
         input = ((int)eventK.key.keysym.sym);
         switch( eventK.type ){
                     case SDL_KEYDOWN:
-                        if(input >= 97 && input <= 122 )
+                        if(input >= 97 && input <= 122 && i < 14)
                         {
                             texte[i] = input;
                             texte[ ++i] = '\0';
-                            affiche_text(renderer, window, texture, texte, rectTexte);
                         }
                         else if(eventK.key.keysym.sym == SDLK_BACKSPACE && i > 0)
                         {
                             texte[--i] = '\0';
-                            SDL_Delay(300);
+                            SDL_Delay(100);
                         }
                         else if(eventK.key.keysym.sym == SDLK_RETURN)
-                            return;
+                            {
+                                efface_nom_par_defaut(window,renderer,texture,indiceJ, 1);
+                                return;
+                            }
+                        efface_nom_par_defaut(window,renderer,texture,indiceJ, 0);
+                        if(i)
+                            affiche_text(renderer, window, texture, texte, rectTexte);
                     break;
                     case SDL_QUIT:
                         quit = 1;
@@ -409,8 +412,10 @@ void event_interface_3(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture
     SDL_Point p;
     SDL_Event event;
     SDL_Rect rectTexte;
+    char texte[14];
     rectTexte.w = 323;   rectTexte.h = 85;
     int quit = 0, nb = 0;
+
     while(!quit)
     {
         SDL_WaitEvent(&event);
@@ -426,9 +431,9 @@ void event_interface_3(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture
                 rectTexte.x = 230 + 436*(nb%2); rectTexte.y = 217 + 183*(nb/2);
                 if(SDL_PointInRect(&p, &rectTexte))
                 {
-                    efface_nom_par_defaut(window,renderer,texture,nb);
-                    event_texte(window, renderer, texture, nb);
-                    printf("here");
+                    efface_nom_par_defaut(window,renderer,texture,nb, 0);
+                    event_texte(window, renderer, texture, nb, texte);
+                    affiche_text(renderer, window, texture, texte, rectTexte);
                 } 
                 nb++;  
             }
