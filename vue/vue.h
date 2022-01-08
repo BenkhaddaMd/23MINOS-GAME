@@ -30,8 +30,7 @@ void affiche_joueur(JoueurPlateau *joueur, int nbJoueurs)
             printf(" -> [ %d | %d ]", position->valeurGauche,position->valeurDroite);
             position = position->suivant;
         }
-        printf("\n");
-        
+        printf("\n");   
     }
 }
 
@@ -40,9 +39,7 @@ SDL_Texture* GetAreaTextrue(SDL_Rect rect, SDL_Renderer* renderer, SDL_Texture* 
   SDL_Texture* result = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, rect.w, rect.h);          
   SDL_SetRenderTarget(renderer, result);
   SDL_RenderCopy(renderer, source, &rect, NULL);
-  // the folowing line should reset the target to default(the screen)
   SDL_SetRenderTarget(renderer, NULL);  
-  // I also removed the RenderPresent funcion as it is not needed here      
   return result;
 }
 
@@ -50,8 +47,8 @@ SDL_Texture* affiche_domino(SDL_Renderer* renderer, SDL_Texture *source, int ind
 {
     SDL_Rect rect;
     
-    rect.x = 142 * ( indice /7);  rect.y = 63*(indice%7);
-    rect.w = 142 ;  rect.h = 63  ;    
+    rect.x = 1082 * ( indice /7);  rect.y = 594  *(indice%7);
+    rect.w = 1082 ;  rect.h = 594  ;    
     
     return GetAreaTextrue(rect, renderer, source);  
 }
@@ -66,7 +63,7 @@ void init_fenetre(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **te
     position.y = 0; 
     position.w = 1250;
     position.h = 680;
-    *window = SDL_CreateWindow("SDL2 Displaying Image",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1250, 680, 0);
+    *window = SDL_CreateWindow("23MINOS",SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1250, 680, 0);
     *renderer = SDL_CreateRenderer(*window, -1, 0);
     background = IMG_Load("background.bmp");
     *texture = SDL_CreateTextureFromSurface(*renderer, background);
@@ -407,12 +404,12 @@ void event_texte(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **tex
     }
 }
 
-void event_interface_3(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, ParametresJeu *param)
+void event_interface_3(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, ParametresJeu *param, JoueurPlateau *joueurs)
 {
     SDL_Point p;
     SDL_Event event;
     SDL_Rect rectTexte;
-    char texte[14];
+    char *texte = NULL;
     rectTexte.w = 323;   rectTexte.h = 85;
     int quit = 0, nb = 0;
 
@@ -431,14 +428,145 @@ void event_interface_3(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture
                 rectTexte.x = 230 + 436*(nb%2); rectTexte.y = 217 + 183*(nb/2);
                 if(SDL_PointInRect(&p, &rectTexte))
                 {
+                    texte = malloc(sizeof(char)*15);
                     efface_nom_par_defaut(window,renderer,texture,nb, 0);
                     event_texte(window, renderer, texture, nb, texte);
                     affiche_text(renderer, window, texture, texte, rectTexte);
+                    Joueur *j = malloc(sizeof(Joueur));
+                    j->nom = texte;
+                    j->score = 0;
+                    joueurs[nb].infos = j;
                 } 
                 nb++;  
             }
+            if(estSuivant_1(p) && texte != NULL)
+                break;
         }
         if(quit)
             detruie(window, renderer, texture);
     }
+}
+
+void interface_plateau(SDL_Window **window, SDL_Renderer **renderer, SDL_Texture **texture, ParametresJeu *param, JoueurPlateau *joueurs, Domino *plateau)
+{
+    SDL_Surface *background, *barVertical, *barHorizontal, *dominos; 
+    SDL_Rect positionVertical, positionHorizontal, position, positionDomino;
+    SDL_Texture *source;
+    
+    positionVertical.x = 110;   positionVertical.y = 10;    positionVertical.w = 1040;  positionVertical.h = 100;
+    positionHorizontal.x = 10;  positionHorizontal.y = 10;  positionHorizontal.w = 100; positionHorizontal.h = 660;
+    positionDomino.x = 15;  positionDomino.y = 20;    
+    positionDomino.w = 90;  positionDomino.h = 45;
+    position.x = 0;     position.y = 0;    
+    position.w = 1250;  position.h = 680;
+ 
+    background = IMG_Load("background.bmp"); 
+    barVertical = IMG_Load("barVertical.gif");
+    barHorizontal = IMG_Load("barHorizontal.gif"); 
+    dominos = IMG_Load("dominos.gif"); 
+
+    *texture = SDL_CreateTextureFromSurface(*renderer, background);
+    SDL_RenderCopy(*renderer, *texture, NULL, &position);
+    *texture = SDL_CreateTextureFromSurface(*renderer, barVertical);
+    SDL_RenderCopy(*renderer, *texture, NULL, &positionVertical);
+    positionVertical.y = 570;
+    *texture = SDL_CreateTextureFromSurface(*renderer, barVertical);
+    SDL_RenderCopy(*renderer, *texture, NULL, &positionVertical);
+
+    *texture = SDL_CreateTextureFromSurface(*renderer, barHorizontal);
+    SDL_RenderCopy(*renderer, *texture, NULL, &positionHorizontal);
+    positionHorizontal.x = 1150;
+    *texture = SDL_CreateTextureFromSurface(*renderer, barHorizontal);
+    SDL_RenderCopy(*renderer, *texture, NULL, &positionHorizontal);
+
+    source = SDL_CreateTextureFromSurface(*renderer, dominos);
+    int indice;
+    Domino *p;
+    for(int k=0; k < param->nbJoueurs; k++)
+    {
+        if(k==0)   
+        {   
+            positionDomino.x = 15; positionDomino.y = 25; 
+        }
+        if(k==1)   
+        {   
+            positionDomino.x = 1155; positionDomino.y = 25; 
+        }
+        else if(k==2)
+        {
+            positionDomino.x = 115;   positionDomino.y = 15;
+        }
+        p = joueurs[k].liste;
+        while (p != NULL)
+        {
+            switch (p->valeurGauche)
+            {
+            case 0:
+                indice = p->valeurDroite;
+                break;
+             case 1:
+                indice = 6 + p->valeurDroite;
+                break;
+             case 2:
+                indice = 11 + p->valeurDroite;
+                break;
+             case 3:
+                indice = 15 + p->valeurDroite;
+                break;
+             case 4:
+                indice = 18 + p->valeurDroite;
+                break;
+             case 5:
+                indice = 20 + p->valeurDroite;
+                break;
+             case 6:
+                indice = 27;
+                break;
+            }
+            *texture = affiche_domino(*renderer, source, indice);
+            SDL_RenderCopy(*renderer, *texture, NULL, &positionDomino);
+            if(k==0 || k==1)
+                positionDomino.y += 50;
+            else if(k==2 || k==3)
+                positionDomino.x += 95;
+            p = p->suivant;
+        }
+    }
+
+    p = plateau;
+    positionDomino.x = 300;
+    positionDomino.y = 200;
+    while (p != NULL)
+    {
+        switch (p->valeurGauche)
+        {
+            case 0:
+                indice = p->valeurDroite;
+                break;
+            case 1:
+                indice = 6 + p->valeurDroite;
+                break;
+            case 2:
+                indice = 11 + p->valeurDroite;
+                break;
+            case 3:
+                indice = 15 + p->valeurDroite;
+                break;
+            case 4:
+                indice = 18 + p->valeurDroite;
+                break;
+            case 5:
+                indice = 20 + p->valeurDroite;
+                break;
+            case 6:
+                indice = 27;
+            break;
+        }
+        *texture = affiche_domino(*renderer, source, indice);
+        SDL_RenderCopy(*renderer, *texture, NULL, &positionDomino);
+        positionDomino.x += 100;
+        p = p->suivant;
+    }
+
+    SDL_RenderPresent(*renderer);
 }
