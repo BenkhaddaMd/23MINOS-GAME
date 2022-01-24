@@ -16,6 +16,7 @@
         "exception": "cpp",
         "type_traits": "cpp",
         "limits": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "string.h": "c"
     }
 }

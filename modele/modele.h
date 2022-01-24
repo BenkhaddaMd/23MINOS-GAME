@@ -95,6 +95,16 @@ void distribuer_dominos(JoueurPlateau *joueurs, int nbJoueurs, Domino **pioche)
     }
 }
 
+Domino* retourne_noeud(Domino **liste, int indice)
+{
+    while (indice > 0)
+    {
+        liste = &(*liste)->suivant;
+        indice--;
+    }
+    return *liste;
+}
+
 Domino* supprime_noeud(Domino **liste, int indice)
 {
     Domino *aRetourne;
@@ -104,7 +114,9 @@ Domino* supprime_noeud(Domino **liste, int indice)
         indice--;
     }
     aRetourne = *liste;
-    if((*liste)->precedent == NULL)
+    if((*liste)->precedent == NULL && (*liste)->suivant == NULL)
+        *liste = NULL;
+    else if((*liste)->precedent == NULL)
     {
         *liste = (*liste)->suivant;
         (*liste)->precedent = NULL;
@@ -145,8 +157,6 @@ Domino* qui_commence(JoueurPlateau *joueur,int nb, int *tour)
             positionPar = positionPar+1;
         }
     }
-     printf(" le domaino a commence [ %d | %d ]\n", max,max);
-     printf(" joueur  %dindice %d \n", positionMax/nbDist, positionMax%nbDist);
      *tour = ((positionMax/nbDist) + 1) % nb;
      return supprime_noeud(&joueur[positionMax/nbDist].liste,positionMax%nbDist);
 }
@@ -157,25 +167,53 @@ void permute(Domino *domino)
     domino->valeurDroite -= domino->valeurGauche; 
 }
 
-void ajout_plateau(Domino **plateau, Domino *domino_a_jouer, int emplacement)
+Domino* ajout_plateau(Domino **plateau, Domino *domino_a_jouer, int emplacement)
 {
     Domino **position = plateau;  
     if(!emplacement)
     {
-        if(domino_a_jouer->valeurDroite != (*plateau)->valeurGauche)
-            permute(domino_a_jouer);
-        domino_a_jouer->suivant = *plateau;
-        (*plateau)->precedent = domino_a_jouer;
-        *plateau = domino_a_jouer;
+        if(domino_a_jouer->valeurDroite == (*plateau)->valeurGauche || domino_a_jouer->valeurGauche == (*plateau)->valeurGauche)
+        {
+            if(domino_a_jouer->valeurDroite != (*plateau)->valeurGauche)
+                permute(domino_a_jouer);
+            (*plateau)->precedent = domino_a_jouer;
+            domino_a_jouer->suivant = *plateau;
+            return domino_a_jouer;
+        }
     }
     else
     {
-        if(domino_a_jouer->valeurGauche != (*position)->valeurDroite)
-            permute(domino_a_jouer);
         while ((*position)->suivant != NULL)
             position = &(*position)->suivant;
-        (*position)->suivant = domino_a_jouer;
-        domino_a_jouer->precedent = *position;
+        if(domino_a_jouer->valeurDroite == (*position)->valeurDroite || domino_a_jouer->valeurGauche == (*position)->valeurDroite)
+        {
+            if(domino_a_jouer->valeurGauche != (*position)->valeurDroite)
+                permute(domino_a_jouer);
+            (*position)->suivant = domino_a_jouer;
+            domino_a_jouer->precedent = *position;
+            return *plateau;
+        }
     }
     
+}
+
+void actualise_plateau(Domino **plateau)
+{
+    Domino **position = plateau;
+    while (((*position)->suivant)->suivant != NULL)
+            position = &(*position)->suivant;
+    (*position)->valeurDroite = 7;
+    (*position)->valeurGauche = 7;
+    (*position)->precedent = *plateau;
+    (*plateau)->suivant = *position;
+}
+
+int est_gangne(JoueurPlateau *listJoueurs , ParametresJeu param)
+{
+    for(int i=0; i<param.nbJoueurs; i++)
+    {
+        if(listJoueurs[i].liste == NULL)
+            return i; 
+    }
+    return -1;
 }
